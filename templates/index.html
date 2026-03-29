@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CodeLens — Real-Time Source Code Analyzer</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- App stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+
+  <!-- Tailwind CDN (utility classes) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          keyframes: {
+            marquee: { '0%': { transform: 'translateX(0%)' }, '100%': { transform: 'translateX(-50%)' } },
+            fadeIn:  { from: { opacity: '0', transform: 'translateY(16px)' }, to: { opacity: '1', transform: 'translateY(0)' } },
+          },
+          animation: {
+            marquee:   'marquee 20s linear infinite',
+            'fade-in': 'fadeIn 0.6s ease forwards',
+          },
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="flex flex-col min-h-screen">
+
+  <!-- ═══════════════════════════════════════════════
+       HERO SECTION
+  ════════════════════════════════════════════════ -->
+  <section class="relative overflow-hidden" style="background: hsl(260,87%,3%);">
+
+    <!-- ── Navbar ─────────────────────────────────── -->
+    <nav class="w-full py-5 px-8 flex items-center justify-between relative z-20">
+
+      <!-- Logo -->
+      <div class="flex items-center gap-2 select-none">
+        <div class="liquid-glass w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold"
+             style="background: hsl(262 83% 58% / 0.20); color: hsl(262 83% 80%);">
+          &lt;/&gt;
+        </div>
+        <span class="font-semibold text-base tracking-tight" style="color: hsl(40 10% 96%);">CodeLens</span>
+      </div>
+
+      <!-- Nav links -->
+      <div class="hidden md:flex items-center gap-6">
+        <button data-scroll="ingest" class="nav-link">
+          Ingest
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <button data-scroll="chat" class="nav-link">Chat</button>
+        <button data-scroll="how" class="nav-link">How It Works</button>
+        <button class="nav-link">
+          Languages
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+      </div>
+
+      <!-- CTA -->
+      <button data-scroll="ingest"
+              class="liquid-glass btn-hero-secondary px-4 py-2 text-sm">
+        Get Started
+      </button>
+    </nav>
+
+    <!-- Navbar divider -->
+    <div class="mt-[3px] w-full h-px" style="background: linear-gradient(to right, transparent, hsl(40 6% 95% / 0.20), transparent);"></div>
+
+    <!-- ── Hero content ─────────────────────────────── -->
+    <div class="flex flex-col items-center text-center pt-16 pb-10 px-4 relative z-10 animate-fade-in">
+
+      <!-- Badge -->
+      <div class="liquid-glass rounded-full px-4 py-1.5 mb-6 text-xs font-medium flex items-center gap-2"
+           style="color: hsl(262 83% 75%); border: 1px solid hsl(262 83% 58% / 0.25);">
+        <span class="w-1.5 h-1.5 rounded-full bg-current animate-pulse inline-block"></span>
+        Powered by Groq · LangChain · ChromaDB
+      </div>
+
+      <!-- Headline -->
+      <h1 class="hero-headline">Analyze</h1>
+
+      <!-- Sub-headline -->
+      <p class="text-center text-lg leading-8 mt-4 opacity-80 max-w-md"
+         style="color: hsl(40 6% 82%);">
+        The most powerful AI for real-time<br/>source code understanding &amp; Q&amp;A
+      </p>
+
+      <!-- CTA -->
+      <div class="mt-8 mb-16 flex flex-col sm:flex-row gap-3">
+        <button data-scroll="ingest"
+                class="liquid-glass btn-hero-secondary"
+                style="padding: 14px 29px;">
+          Analyze a Repository
+        </button>
+        <button data-scroll="how"
+                class="btn-primary"
+                style="padding: 14px 29px;">
+          See How It Works
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       VIDEO / SOCIAL PROOF SECTION
+  ════════════════════════════════════════════════ -->
+  <section id="video-section" class="relative w-full overflow-hidden">
+
+    <!-- Background video with fade loop -->
+    <video id="bg-video"
+           autoplay muted playsinline
+           class="absolute inset-0 w-full h-full object-cover"
+           style="opacity: 0;">
+      <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260308_114720_3dabeb9e-2c39-4907-b747-bc3544e2d5b7.mp4" type="video/mp4" />
+    </video>
+
+    <!-- Gradient overlays -->
+    <div class="absolute inset-0 pointer-events-none"
+         style="background: linear-gradient(to bottom, hsl(260,87%,3%), transparent 35%, transparent 65%, hsl(260,87%,3%));"></div>
+
+    <!-- Section content (z-10) -->
+    <div class="relative z-10 flex flex-col items-center pt-16 pb-24 px-4 gap-20">
+
+      <!-- Spacer so video peeks through -->
+      <div class="h-40"></div>
+
+      <!-- Logo marquee -->
+      <div id="how" class="w-full max-w-5xl flex items-center gap-8 overflow-hidden">
+
+        <!-- Left label -->
+        <p class="text-sm whitespace-nowrap shrink-0 leading-6"
+           style="color: hsl(40 6% 95% / 0.50);">
+          Works with repos<br/>across the web
+        </p>
+
+        <!-- Scrolling logos -->
+        <div class="flex-1 overflow-hidden" style="mask: linear-gradient(to right, transparent, #fff 10%, #fff 90%, transparent);">
+          <div class="marquee-track gap-16 items-center">
+            <!-- First set -->
+            <div class="flex items-center gap-3 shrink-0">
+              <div class="liquid-glass w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold shrink-0" style="color: hsl(262 83% 75%);">P</div>
+              <span class="text-base font-semibold whitespace-nowrap" style="color: hsl(40 6% 95%);">Python</span>
+            </div>
+            <div class="flex items-center gap-3 shrink-0">
+              <div class="liquid-glass w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold shrink-0" style="color: hsl(200 80% 70%);">J</div>
+              <span class="text-base font-semibold whitespace-nowrap" style="color: hsl(40 6% 95%);">JavaScript</span>
+            </div>
+            <div class="flex items-center gap-3 shrink-0">
+              <div class="liquid-glass w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold shrink-0" style="color: hsl(30 90% 70%);">T</div>
+              <span class="text-base font-semibold whitespace-nowrap" style="color: hsl(40 6% 95%);">TypeScript</span>
+            </div>
+            <div class="flex items-center gap-3 shrink-0">
+              <div class="liquid-glass w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold shrink-0" style="color: hsl(120 50% 65%);">G</div>
+              <span class="text-base font-semibold whitespace-nowrap" style="color: hsl(40 6% 95%);">Go</span>
+            </div>
+            <div class="flex items-center gap-3 shrink-0">
+              <div class="liquid-glass w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold shrink-0" style="color: hsl(350 80% 70%);">R</div>
+              <span class="text-base font-semibold whitespace-nowrap" style="color: hsl(40 6% 95%);">Ruby</span>
+            </div>
+            <div class="flex items-center gap-3 shrink-0">
+              <div class="liquid-glass w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold shrink-0" style="color: hsl(220 70% 70%);">J</div>
+              <span class="text-base font-semibold whitespace-nowrap" style="color: hsl(40 6% 95%);">Java</span>
+            </div>
+            <!-- Duplicate for seamless loop -->
+            <div class="flex items-center gap-3 shrink-0">
+              <div class="liquid-glass w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold shrink-0" style="color: hsl(262 83% 75%);">P</div>
+              <span class="text-base font-semibold whitespace-nowrap" style="color: hsl(40 6% 95%);">Python</span>
+            </div>
+            <div class="flex items-center gap-3 shrink-0">
+              <div class="liquid-glass w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold shrink-0" style="color: hsl(200 80% 70%);">J</div>
+              <span class="text-base font-semibold whitespace-nowrap" style="color: hsl(40 6% 95%);">JavaScript</span>
+            </div>
+            <div class="flex items-center gap-3 shrink-0">
+              <div class="liquid-glass w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold shrink-0" style="color: hsl(30 90% 70%);">T</div>
+              <span class="text-base font-semibold whitespace-nowrap" style="color: hsl(40 6% 95%);">TypeScript</span>
+            </div>
+            <div class="flex items-center gap-3 shrink-0">
+              <div class="liquid-glass w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold shrink-0" style="color: hsl(120 50% 65%);">G</div>
+              <span class="text-base font-semibold whitespace-nowrap" style="color: hsl(40 6% 95%);">Go</span>
+            </div>
+            <div class="flex items-center gap-3 shrink-0">
+              <div class="liquid-glass w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold shrink-0" style="color: hsl(350 80% 70%);">R</div>
+              <span class="text-base font-semibold whitespace-nowrap" style="color: hsl(40 6% 95%);">Ruby</span>
+            </div>
+            <div class="flex items-center gap-3 shrink-0">
+              <div class="liquid-glass w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold shrink-0" style="color: hsl(220 70% 70%);">J</div>
+              <span class="text-base font-semibold whitespace-nowrap" style="color: hsl(40 6% 95%);">Java</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       INGEST SECTION
+  ════════════════════════════════════════════════ -->
+  <section id="ingest" class="py-20 px-4" style="background: hsl(240 6% 9%);">
+    <div class="max-w-2xl mx-auto">
+
+      <h2 class="text-3xl font-semibold text-center mb-2" style="color: hsl(40 10% 96%);">Index a Repository</h2>
+      <p class="text-center text-sm mb-10" style="color: hsl(40 6% 82% / 0.70);">
+        Paste any public GitHub URL and CodeLens will clone, parse, and index it for you.
+      </p>
+
+      <div class="liquid-glass rounded-2xl p-6" style="border: 1px solid hsl(240 4% 20%);">
+        <form id="ingest-form" class="flex flex-col gap-4">
+          <label class="text-sm font-medium" style="color: hsl(40 6% 82%);">GitHub Repository URL</label>
+          <input id="repo-url"
+                 type="url"
+                 placeholder="https://github.com/user/repo"
+                 required
+                 class="repo-input" />
+          <button type="submit"
+                  id="ingest-btn"
+                  class="btn-primary w-full rounded-xl py-3 text-sm">
+            Analyze Repository
+          </button>
+        </form>
+
+        <!-- Status banner -->
+        <div id="ingest-status" class="status-banner"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       CHAT SECTION
+  ════════════════════════════════════════════════ -->
+  <section id="chat" class="py-20 px-4" style="background: hsl(260 87% 3%);">
+    <div class="max-w-2xl mx-auto">
+
+      <h2 class="text-3xl font-semibold text-center mb-2" style="color: hsl(40 10% 96%);">Ask the Codebase</h2>
+      <p class="text-center text-sm mb-10" style="color: hsl(40 6% 82% / 0.70);">
+        Ask anything about the indexed repository in plain English.
+      </p>
+
+      <!-- Chat window -->
+      <div id="chat-window" class="liquid-glass">
+
+        <!-- Messages -->
+        <div id="chat-messages">
+          <!-- Welcome message -->
+          <div class="chat-bubble-bot rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%]">
+            <p class="text-sm leading-6" style="color: hsl(40 6% 95%);">
+              👋 Hi! Index a repository above, then ask me anything about its code — functions, architecture, bugs, dependencies, you name it.
+            </p>
+          </div>
+        </div>
+
+        <div class="chat-divider"></div>
+
+        <!-- Input row -->
+        <div id="chat-input-row">
+          <input id="chat-input"
+                 type="text"
+                 placeholder="e.g. What does the download_data function do?" />
+          <button id="send-btn" class="btn-primary shrink-0 rounded-xl px-4 py-2 text-sm">
+            Send
+          </button>
+        </div>
+      </div>
+
+      <p class="text-center text-xs mt-3" style="color: hsl(240 5% 65%);">
+        Powered by Groq LLM · Chroma vector store · LangChain RAG
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       HOW IT WORKS
+  ════════════════════════════════════════════════ -->
+  <section class="py-20 px-4" style="background: hsl(240 6% 9%);">
+    <div class="max-w-4xl mx-auto">
+      <h2 class="text-3xl font-semibold text-center mb-12" style="color: hsl(40 10% 96%);">How It Works</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Step 1 -->
+        <div class="liquid-glass rounded-2xl p-6 flex flex-col gap-3" style="border: 1px solid hsl(240 4% 20%);">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold"
+               style="background: hsl(262 83% 58% / 0.15); color: hsl(262 83% 75%);">1</div>
+          <h3 class="font-semibold" style="color: hsl(40 10% 96%);">Clone &amp; Parse</h3>
+          <p class="text-sm leading-6" style="color: hsl(40 6% 82% / 0.75);">
+            GitPython clones the repo. LangChain's GenericLoader and LanguageParser extract Python source files into structured documents.
+          </p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="liquid-glass rounded-2xl p-6 flex flex-col gap-3" style="border: 1px solid hsl(240 4% 20%);">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold"
+               style="background: hsl(262 83% 58% / 0.15); color: hsl(262 83% 75%);">2</div>
+          <h3 class="font-semibold" style="color: hsl(40 10% 96%);">Embed &amp; Index</h3>
+          <p class="text-sm leading-6" style="color: hsl(40 6% 82% / 0.75);">
+            RecursiveCharacterTextSplitter chunks the code. HuggingFace embeddings convert each chunk to vectors stored in ChromaDB.
+          </p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="liquid-glass rounded-2xl p-6 flex flex-col gap-3" style="border: 1px solid hsl(240 4% 20%);">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold"
+               style="background: hsl(262 83% 58% / 0.15); color: hsl(262 83% 75%);">3</div>
+          <h3 class="font-semibold" style="color: hsl(40 10% 96%);">RAG + Groq</h3>
+          <p class="text-sm leading-6" style="color: hsl(40 6% 82% / 0.75);">
+            Your question retrieves the most relevant code chunks. Groq's LLM synthesises a precise, context-aware answer in real time.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       FOOTER
+  ════════════════════════════════════════════════ -->
+  <footer class="py-8 px-8 flex items-center justify-between text-xs border-t"
+          style="background: hsl(260 87% 3%); border-color: hsl(240 4% 20%); color: hsl(240 5% 65%);">
+    <span>© 2026 CodeLens · Real-Time Source Code Analyzer</span>
+    <span>Built with Flask · LangChain · Groq · ChromaDB</span>
+  </footer>
+
+  <!-- jQuery + App JS -->
+  <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+
+</body>
+</html>
